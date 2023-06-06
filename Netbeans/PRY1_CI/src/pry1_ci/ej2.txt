@@ -1,3 +1,4 @@
+ 
 int main(){
 	read(miInt2)$
 	sysPrint("hola")$
@@ -13,22 +14,14 @@ float miFunc (int dif, char otra){
 	{
 		do
 		{
-			var = var-1$
+			int var = var-1$
 		}while(var>12 # (34+34)>12)$
 
 		if (var == 0)
 		{
 			print("entra al if")$
 		}
-		elif(true)
-		{
-			print(var)$
-		}
-		elif(false^true)
-		{
-			read(var2)$
-			break$
-		}
+		
 	}
 	return 1$ @error
 }
@@ -36,3 +29,4 @@ float miFunc (int dif, char otra){
 boolean miOtraFun(){
 	return -5.6$ @error
 }
+

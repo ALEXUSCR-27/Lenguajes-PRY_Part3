@@ -102,6 +102,7 @@ FlotanteN = - ({FlotanteC}|{FlotanteP})
 
 <YYINITIAL> "sysPrint" {return symbol(sym.SYS_PRINT);}
 <YYINITIAL> "sysRead" {return symbol(sym.SYS_READ);}
+//<YYINITIAL> "main" {return symbol(sym.MAIN);}
 <YYINITIAL> "false" {return symbol(sym.L_BOOLEANO, false);}
 <YYINITIAL> "true" {return symbol(sym.L_BOOLEANO, true);}
 	
@@ -138,7 +139,6 @@ FlotanteN = - ({FlotanteC}|{FlotanteP})
     "!="    {return symbol(sym.NOT_EQ);}
     "**"    {return symbol(sym.POWER);}
     "~"     {return symbol(sym.MODULO);}
-    "\n"    {return symbol(sym.SALTO);}
 
     // Literales
 	// Numeros

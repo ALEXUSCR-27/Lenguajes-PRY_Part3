@@ -81,7 +81,7 @@ public class PRY1_CI {
      * @throws java.io.IOException
     */
     private static void probarLexer() throws FileNotFoundException, IOException {
-        String rutaEJ1 = "src/pry1_ci/ej.txt";
+        String rutaEJ1 = "src/pry1_ci/ej2.txt";
         Reader reader = new BufferedReader(new FileReader (rutaEJ1));
         reader.read();
         LexerAS lexer = new LexerAS(reader);
@@ -123,7 +123,7 @@ public class PRY1_CI {
     }
     
     private static void probarParser() throws FileNotFoundException, IOException, Exception {
-        String rutaEJ1 = "src/pry1_ci/ej.txt";
+        String rutaEJ1 = "src/pry1_ci/ej2.txt";
         Reader reader = new BufferedReader(new FileReader (rutaEJ1));
         reader.read();
         LexerAS lexer = new LexerAS(new FileReader (rutaEJ1));

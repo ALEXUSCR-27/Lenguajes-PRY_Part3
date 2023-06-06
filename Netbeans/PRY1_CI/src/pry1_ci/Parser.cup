@@ -186,6 +186,7 @@ start with inicio;
 inicio ::= programa {:imprimirTabla();:};
 programa ::= COMENTARIO  main funciones
            | main funciones
+           | main
 
            
 ;
@@ -205,8 +206,7 @@ bloqueCod ::= sentencia
             | sentencia bloqueCod
             | estructControl bloqueCod
             | COMENTARIO
-
-
+            | error FIN_EXPRESION {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()) ; :}
 ;   
 
 
@@ -361,9 +361,6 @@ obtenerDatoArreglo ::= Identificador LLAVESCUADABRE L_ENTERO LLAVESCUADCIERRA
 ;
 
 
-
-
-
 // -----------------------------------------------[PRODUCCION DE FUNCIONES]----------------------------------------------|
 funcion	::= Identificador:vID PARENTESISABRE PARENTESISCIERRA 
           | Identificador:vID PARENTESISABRE parametro PARENTESISCIERRA 
@@ -440,7 +437,7 @@ estructControl ::= if
                 | elif 
                 | else 
                 | while
-                | do
+                | do FIN_EXPRESION
                 | for
                 | error sentencia 
 {: 
@@ -482,7 +479,7 @@ do ::= DO LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA WHILE PARENTESIS
 // Produccion de bloque de control---------------------------------------------------------------------------------------|
 
 bloqueControl ::= bloqueCod 
-                | break
+                | BREAK FIN_EXPRESION
 ;
 
 for ::= FOR PARENTESISABRE condicion PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA
@@ -530,17 +527,18 @@ return ::= RETURN literal:vL FIN_EXPRESION
 ;
 
 // Produccion de condicion
-condicion ::= L_BOOLEANO 
-            | expresionRelacion:vER {: RESULT = vER.toString(); :}
-            | expresionNegacion
+condicion ::= L_BOOLEANO
+            | expresion
+            | expresion operadorConjuntiva condicion
 ;
 
 //----------------------------------------------------[PRODUCCION DE EXPRESIONES]--------------------------------------------|
 expresion ::= expresionBinaria:vRes
             | expresionUnaria 
-            | expresionRelacion:vER 
+            | expresionRelacion:vER {: RESULT = vER.toString(); :}
             | expresionNegacion 
             | expresionConjuntiva
+            | expresionBinaria operadorRelacional literal
 ;
 
 // Produccion de expresiones relaciones
@@ -573,7 +571,9 @@ expresionRelacion ::= operando:vOPL operadorRelacional:vOR operando:vOPR {:
         }
     }
     RESULT = op1+vOR.toString()+op2; 
+                
 :}
+                    
                     | operando operadorComparacion operando
 ;
 operadorRelacional ::= GREATER_THAN {: RESULT = ">"; :}
@@ -594,7 +594,6 @@ operadorNegacion ::= NEGACION {: RESULT = "!"; :}
 
 // Produccion de expresiones unarias
 expresionUnaria	::= operando operadorUnario
-                  //| MINUS operando
                   | operadorUnario operando 
 ;
 
@@ -752,6 +751,7 @@ expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
 */
     
 :}
+        | PARENTESISABRE expresionBinaria PARENTESISCIERRA
         | operando operadorBinario operando  operadorBinario operando 
         | operando operadorBinario operando  operadorBinario expresionBinaria
 ;
@@ -766,10 +766,10 @@ operadorBinario ::= PLUS {: RESULT = "+"; :}
 // Produccion de expresiones Conjuntivas
 expresionConjuntiva	::= operando operadorConjuntiva operando;
 operadorConjuntiva	::= CONJUNCION {: RESULT = "^"; :}
-                      | DISYUNCION {: RESULT = "#"; :}
+                          | DISYUNCION {: RESULT = "#"; :}
 ;
 operando ::= literal:vL {: RESULT = vL; :} 
-           | Identificador:vI 
+           | Identificador:vI
 {: 
     if (existeVar(vI.toString(), listaTablasSimbolos.get(tablaActual))) RESULT = vI;
     else { 
