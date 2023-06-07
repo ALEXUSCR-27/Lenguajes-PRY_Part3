@@ -4,6 +4,3 @@ return t0
 miFunc_:
 str = Hola $%&/#$&) mundo
 i = 0
-t1 = 34
-t2 = 34
-t3 = t1 + t2

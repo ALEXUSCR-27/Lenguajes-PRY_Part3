@@ -20,8 +20,8 @@ public class sym {
   public static final int GREATER_THAN_OR_EQ = 36;
   public static final int INT = 14;
   public static final int L_FLOTANTE = 47;
-  public static final int FOR = 8;
   public static final int MINUS = 24;
+  public static final int FOR = 8;
   public static final int GREATER_THAN = 34;
   public static final int LESS_THAN_OR_EQ = 37;
   public static final int SYS_READ = 19;
@@ -38,13 +38,13 @@ public class sym {
   public static final int SYS_PRINT = 18;
   public static final int error = 1;
   public static final int COMA = 42;
-  public static final int COMENTARIO = 16;
-  public static final int MODULO = 28;
   public static final int NEGACION = 29;
+  public static final int MODULO = 28;
+  public static final int COMENTARIO = 16;
   public static final int EQEQ = 20;
   public static final int BREAK = 9;
-  public static final int EQ = 22;
   public static final int DIVI = 25;
+  public static final int EQ = 22;
   public static final int TIMES = 23;
   public static final int ELSE = 4;
   public static final int NOT_EQ = 26;

@@ -79,7 +79,7 @@ FlotanteN = - ({FlotanteC}|{FlotanteP})
 /* keywords */
 
 /*Tipos*/
-<YYINITIAL> "bool" {return symbol(sym.BOOL);}
+<YYINITIAL> "boolean" {return symbol(sym.BOOL);}
 <YYINITIAL> "int" {return symbol(sym.INT);}
 <YYINITIAL> "float" {return symbol(sym.FLOAT);}
 <YYINITIAL> "string" {return symbol(sym.STRING);}
@@ -154,7 +154,7 @@ FlotanteN = - ({FlotanteC}|{FlotanteP})
     \"			{yybegin(CADENA); string.setLength(0);}
     
     /*comments*/
-    {Comentario} {return symbol(sym.COMENTARIO);}
+    {Comentario} {}
 
     /*whitespace*/
     {EspacioB} {/*ignore*/}

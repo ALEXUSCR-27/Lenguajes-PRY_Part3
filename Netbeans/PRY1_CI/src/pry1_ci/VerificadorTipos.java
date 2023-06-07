@@ -47,10 +47,9 @@ public class VerificadorTipos {
      * @return Valor Booleano
      * Funcion para verificar si una cadena de carateres puede ser entero
      */
-    public boolean verificarEntero(String valor) {
+    public boolean verificarEntero(Object valor) {
         try{
-            Integer.parseInt(valor);
-            return true;
+            return valor instanceof Integer;
         }
         catch(NumberFormatException e) {
             return false;

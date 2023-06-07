@@ -10,9 +10,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Scanner;
 import java_cup.runtime.Symbol;
 
 /**
@@ -26,7 +28,43 @@ public class PRY1_CI {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException, Exception {
-        Limpiar();
+        Menu();
+    }
+    
+    private static void Menu() throws IOException, Exception {
+        
+        System.out.println("[PARSER ASC LANGUAGE]");
+        System.out.print("1.Analisis lexico\n2.Analisis sintactico y semantico (Generacion de codigo intermedio)\n3.Generacion de codigo MIPS\n0.Salir\n>");
+        String opcion ="";
+        Scanner scanner  = new Scanner(System.in);
+        try {
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(System.in));
+            do {
+                opcion = buffer.readLine();
+
+                switch(opcion) {
+                    case "1":
+                        Limpiar();
+                        probarLexer();
+                        System.out.print("\nPresione cualquier tecla para continuar...............");
+                        scanner.nextLine();
+                        Menu();
+                        break;
+                    case "2":
+                        Limpiar();
+                        probarParser();
+                        System.out.print("\nPresione cualquier tecla para continuar...............");
+                        scanner.nextLine();
+                        Menu();
+                        break;
+                    case "0":
+                        return;
+                    default:
+                        break;
+                }
+            }while(!opcion.equals("0"));
+        }
+        catch(Exception e) {}
     }
         
     /**
@@ -51,8 +89,6 @@ public class PRY1_CI {
         
         Files.move(Paths.get(raiz+"\\sym.java"), Paths.get(raiz+"\\src\\pry1_ci\\sym.java"));
         Files.move(Paths.get(raiz+"\\parser.java"), Paths.get(raiz+"\\src\\pry1_ci\\parser.java"));
-        //probarLexer();
-        probarParser();
        
     }
     
