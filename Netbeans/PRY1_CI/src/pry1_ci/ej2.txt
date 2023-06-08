@@ -12,12 +12,10 @@ float miFunc (int dif, char otra){
 	string str = "Hola $%&/#$&) mundo"$
 	for(int i=0$i>10$++i)
 	{
-	
-
-		if (true)
-		{
-                    break$
-		}
+            if (otra>10)
+            {
+                return 0$
+            }
 		
 	}
 	return 1$ @error

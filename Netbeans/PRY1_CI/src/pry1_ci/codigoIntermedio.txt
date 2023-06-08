@@ -1,6 +1,5 @@
 main_:
-t0 = 1
-return t0
-miFunc_:
-str = Hola $%&/#$&) mundo
-i = 0
+miChar = !
+str1 = Mi string 1
+arr[10] = {}
+arr2[3] = {}

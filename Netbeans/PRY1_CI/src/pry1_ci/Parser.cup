@@ -414,19 +414,17 @@ tipoIDFun ::= tipoFuncion:vTF Identificador:vID
 
 
 // -----------------------------------------------[PRODUCCION DE PARAMETROS]----------------------------------------------|
-parametro ::= Identificador:vID 
+parametro ::= Identificador:vID
 {: 
     if (!existeVar(vID.toString(), listaTablasSimbolos.get(tablaActual))) System.err.println("Error semantico en la linea "+scanner.getYYLine()+", no existe la variable -> "+vID.toString());
     RESULT = vID; 
 :}
             | literal:vL {: RESULT = vL; :}
             | funcion:vF {: RESULT = vF; :}
-            | Identificador COMA parametro
+            | Identificador:vID {: RESULT = vID; :} COMA parametro
 ;
 
-crearParametro ::= crearVariable
-                 | crearVariable COMA crearParametro
-;
+
 
 // Produccion de funcion de entrada estandar
 entradaEst ::= SYS_READ PARENTESISABRE L_ENTERO PARENTESISCIERRA
@@ -471,7 +469,7 @@ if ::= IF PARENTESISABRE condicion:vCon PARENTESISCIERRA LLAVESCORCHETEABRE bloq
 :}
       | IF PARENTESISABRE condicion PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA elif
       | IF PARENTESISABRE condicion PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA else
-
+      | error LLAVESCORCHETECIERRA
 
 ;
 
@@ -538,8 +536,8 @@ return ::= RETURN literal:vL
 ;
 
 // Produccion de condicion
-condicion ::= L_BOOLEANO
-            | expresion
+condicion ::= L_BOOLEANO:vBO {: RESULT = vBO.toString(); :}
+            | expresion:vEX {: RESULT = vEX.toString(); :}
             | expresion operadorConjuntiva condicion
 ;
 

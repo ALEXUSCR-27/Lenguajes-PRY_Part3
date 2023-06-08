@@ -22,10 +22,10 @@ public class VerificadorTipos {
     public boolean opciones(String tipo, String valor, Object valor2) {
         switch(tipo){
             case "int":
-                if (verificarEntero(valor)) return true;
+                if (verificarEntero(valor2)) return true;
                 break;
             case "bool":
-                if (verificarBooleano(valor)) return true;
+                if (verificarBooleano(valor2)) return true;
                 break;
             case "float":
                 if (verificarFloat(valor2)) return true;

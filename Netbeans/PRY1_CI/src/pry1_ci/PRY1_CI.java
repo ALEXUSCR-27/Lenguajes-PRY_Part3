@@ -65,6 +65,7 @@ public class PRY1_CI {
             }while(!opcion.equals("0"));
         }
         catch(Exception e) {}
+        scanner.close();
     }
         
     /**
@@ -159,7 +160,7 @@ public class PRY1_CI {
     }
     
     private static void probarParser() throws FileNotFoundException, IOException, Exception {
-        String rutaEJ1 = "src/pry1_ci/ej2.txt";
+        String rutaEJ1 = "src/pry1_ci/ej4.txt";
         Reader reader = new BufferedReader(new FileReader (rutaEJ1));
         reader.read();
         LexerAS lexer = new LexerAS(new FileReader (rutaEJ1));
@@ -173,7 +174,7 @@ public class PRY1_CI {
             Object result = p.parse();
         
         }catch (Exception e) {
-            System.err.println("Error al intentar realizar analisis: " + e.getMessage());
+            System.err.println("Error al intentar realizar analisis: " + e);
             System.err.println("El archivo no se puede compilar");
         }
            
