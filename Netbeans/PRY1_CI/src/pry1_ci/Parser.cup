@@ -30,7 +30,6 @@ action code {:
 
     public void escribirCodigo(String cadenas) throws FileNotFoundException, IOException{
         escribir = new FileWriter(rutaCodigo, true);
-        //BufferedWriter buffer = new BufferedWriter(escribir);
         escribir.write(cadenas);
         escribir.close();
     }
@@ -38,15 +37,7 @@ action code {:
 
     // Funcion para impresion de tabla de simbolos
     public void imprimirTabla() {
-        /*System.out.println("[IMPRIMIENDO TABLA DE SIMBOLOS]\n");
-        for (String key: listaTablasSimbolos.keySet()) {
-            System.out.println("Tabla de simbolos Funcion:"+ key);
-            System.out.println("Valores del bloque de funcion ");
-            for (String item : listaTablasSimbolos.get(key)) {
-                System.out.println(item);
-            }
-            System.out.println("");
-        }*/
+       
         System.out.println("[#----------------------Impresion de Tabla de Simbolos----------------------#]\n");
         
         for (String i : listaTablasSimbolos.keySet()) {
@@ -111,9 +102,6 @@ init with {: action_obj.scanner = scanner;:};
 terminal FIN_EXPRESION;
 terminal IF, ELSE, ELIF, WHILE, DO, FOR, BREAK, RETURN;
 terminal BOOL, CHAR, FLOAT, INT, STRING;
-
-// Comentarios
-terminal COMENTARIO, SALTO;
 
 // Entrada y salida estandar
 terminal SYS_PRINT, SYS_READ;
@@ -182,7 +170,7 @@ precedence left FIN_EXPRESION;
 
 start with inicio;
 
-//Programa Principal-----------------------------------------------------------------------------------------------------|
+//-------------------------------------------------------- [INICIO] ----------------------------------------------------|
 inicio ::= programa {:
     Thread.sleep(500);
     imprimirTabla();
@@ -192,7 +180,7 @@ programa ::= funciones
 
            
 ;
-//Funcion o funciones----------------------------------------------------------------------------------------------------|
+//-------------------------------------------------------- [FUNCIONES] ----------------------------------------------------|
 funciones ::= crearFuncion funciones
             | crearFuncion
 ;
@@ -201,17 +189,17 @@ funciones ::= crearFuncion funciones
 
 //;
 
-// Produccion de bloque de codigo----------------------------------------------------------------------------------------|
+//-------------------------------------------------------- [BLOQUECOD] ----------------------------------------------------|
 bloqueCod ::= sentencia 
             | estructControl 
             | return FIN_EXPRESION
             | sentencia bloqueCod
             | estructControl bloqueCod
-            | error {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()+" [BLOQUE DE CODIGO]") ; :} FIN_EXPRESION 
+            | error {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()) ; :} FIN_EXPRESION 
 ;   
 
 
-// Produccion de sentencias----------------------------------------------------------------------------------------------|
+//-------------------------------------------------------- [SENTENCIA] ----------------------------------------------------|
 sentencia ::= crearVariable FIN_EXPRESION 
             | crearAsignarVariable FIN_EXPRESION
             | asignarVariable FIN_EXPRESION
@@ -222,12 +210,12 @@ sentencia ::= crearVariable FIN_EXPRESION
             | funcion FIN_EXPRESION
             | entradaEst:vET FIN_EXPRESION
             | salidaEst FIN_EXPRESION
-            | error  FIN_EXPRESION {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()+" [CREACION DE SENTENCIA]"); :}
+            | error  FIN_EXPRESION {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()); :}
           
           
 ;
 
-// Produccion de creacion y asignacion de variables---------------------------------------------------------------------------|
+//-------------------------------------------------------- [CREAR VARIABLE] ----------------------------------------------------|
 crearVariable ::= tipoVariable:vTV Identificador:vID 
                    {:
                         String tipo = vTV.toString();
@@ -241,7 +229,7 @@ crearVariable ::= tipoVariable:vTV Identificador:vID
 ;
 
 
-
+//-------------------------------------------------------- [CREAR ASIGNAR VARIABLES] ----------------------------------------------------|
 crearAsignarVariable ::= crearVariable:vID EQ literal:vL 
 {:
     String tipo = listaTablasSimbolos.get(tablaActual).get(vID).toString();
@@ -251,7 +239,8 @@ crearAsignarVariable ::= crearVariable:vID EQ literal:vL
     String msg = vID.toString()+" = "+vL.toString()+"\n";
     escribirCodigo(msg);
  :}
-                       | crearVariable:vID EQ expresion 
+                       | crearVariable:vID EQ expresion:vEX
+
                        | crearVariable:vID EQ Identificador:vI
 {:
     String tipo = listaTablasSimbolos.get(tablaActual).get(vID).toString();
@@ -355,7 +344,8 @@ asignarElementoArreglo	::= elementoArreglo:vEL  EQ L_ENTERO:vLE
     escribirCodigo(msg);
     t++;
 :} 
-                          | elementoArreglo  EQ  L_CHAR
+                          | elementoArreglo EQ  L_CHAR
+                          | elementoArreglo EQ expresionBinaria
 ;
 
 //----------------------------------------- [ESPECIFICACION DE ELEMENTO DE UN ARREGLO] -------------------------------------|
@@ -377,6 +367,7 @@ funcion	::= Identificador:vID PARENTESISABRE PARENTESISCIERRA
           | Identificador:vID PARENTESISABRE parametro PARENTESISCIERRA 
 ;
 
+//-------------------------------------------------------- [CREAR FUNCION] ----------------------------------------------------|
 crearFuncion ::= tipoIDFun PARENTESISABRE PARENTESISCIERRA LLAVESCORCHETEABRE bloqueCod LLAVESCORCHETECIERRA 
                | tipoIDFun PARENTESISABRE Identificador PARENTESISCIERRA LLAVESCORCHETEABRE bloqueCod LLAVESCORCHETECIERRA 
                | tipoIDFun PARENTESISABRE literal  PARENTESISCIERRA LLAVESCORCHETEABRE bloqueCod LLAVESCORCHETECIERRA
@@ -384,15 +375,9 @@ crearFuncion ::= tipoIDFun PARENTESISABRE PARENTESISCIERRA LLAVESCORCHETEABRE bl
                | error {:System.err.println("Error sintactico en la linea "+scanner.getYYLine()+" [CREACION DE FUNCION]");:} LLAVESCORCHETECIERRA
 ;
 
+//-------------------------------------------------------- [TIPO Y ID DE FUNCION] ----------------------------------------------------|
 tipoIDFun ::= tipoFuncion:vTF Identificador:vID 
 {:
-    //String tipoTabla = "";
-   // if (vID.toString().equals("main")) tipoTabla = "Funcion [main], tipo:"+vTF.toString();
-   // else {tipoTabla = "Funcion ["+vID+"], tipo :"+vTF.toString();}
-    //ArrayList<String> funciones = new ArrayList<String>();   
-    //System.out.println(nombreFun);
-    //funciones.add(tipoTabla);
-
 
     tablaActual = "Tabla:"+vID.toString(); 
     HashMap<String, String> datosFuncion = new HashMap<String, String>();
@@ -426,12 +411,12 @@ parametro ::= Identificador:vID
 
 
 
-// Produccion de funcion de entrada estandar
+//-------------------------------------------------------- [ENTRADA ESTANDAR] ----------------------------------------------------|
 entradaEst ::= SYS_READ PARENTESISABRE L_ENTERO PARENTESISCIERRA
              | SYS_READ PARENTESISABRE L_FLOTANTE PARENTESISCIERRA
 ;
 
-// Produccion de funcion de salida estandar
+//-------------------------------------------------------- [SALIDA ESTANDAR] ----------------------------------------------------|
 salidaEst ::= SYS_PRINT PARENTESISABRE Identificador:vID PARENTESISCIERRA
 
 {:
@@ -441,21 +426,20 @@ salidaEst ::= SYS_PRINT PARENTESISABRE Identificador:vID PARENTESISCIERRA
             | SYS_PRINT PARENTESISABRE literal:vL PARENTESISCIERRA 
 ;
 
-// Produccion de estructuras de control
+//-------------------------------------------------------- [ESTRUCTURAS DE CONTROL] ----------------------------------------------|
 estructControl ::= if 
                 | elif 
                 | else 
                 | while
                 | do FIN_EXPRESION
                 | for
-                | error sentencia 
+                | error 
 {: 
-System.err.println("Error sintactico en la linea "+scanner.getYYLine()+" [ESTRUCTURA DE CONTROL]");
-:}
-                
+System.err.println("Error sintactico en la linea "+scanner.getYYLine());
+:} sentencia              
 ;
 
-// Produccion de IF
+//-------------------------------------------------------- [IF] ----------------------------------------------------|
 if ::= IF PARENTESISABRE condicion:vCon PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA
 {:
     String temp1 = "L"+l;
@@ -473,35 +457,37 @@ if ::= IF PARENTESISABRE condicion:vCon PARENTESISCIERRA LLAVESCORCHETEABRE bloq
 
 ;
 
-// Produccion de ELIF
+//-------------------------------------------------------- [ELIF] ----------------------------------------------------|
 elif ::= if ELIF PARENTESISABRE condicion PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA;
 
-// Produccion de ELSE
+//-------------------------------------------------------- [ELSE] ----------------------------------------------------|
 else ::= if ELSE LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA;
 
-// Produccion de WHILE
+//-------------------------------------------------------- [WHILE] ----------------------------------------------------|
 while ::= WHILE PARENTESISABRE condicion PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA;
 
-// Produccion de DO
+//-------------------------------------------------------- [DO] ----------------------------------------------------|
 do ::= DO LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA WHILE PARENTESISABRE condicion PARENTESISCIERRA;
 
-// Produccion de bloque de control---------------------------------------------------------------------------------------|
-bloqueControl ::= bloqueCod 
-                | break
-;
-
+//-------------------------------------------------------- [FOR] ----------------------------------------------------|
 for ::= FOR PARENTESISABRE condicion PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA
       | FOR PARENTESISABRE L_BOOLEANO PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA
       | FOR PARENTESISABRE expresionConjuntiva PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA
       | FOR PARENTESISABRE expresionFor PARENTESISCIERRA LLAVESCORCHETEABRE bloqueControl LLAVESCORCHETECIERRA
 ;
 
+//-------------------------------------------------------- [EXPRESION FOR] ----------------------------------------------------|
 expresionFor::= crearAsignarVariable FIN_EXPRESION expresionRelacion FIN_EXPRESION expresionUnaria;
 
-// Produccion de BREAK
+//-------------------------------------------------------- [BLOQUE DE CONTROL] ----------------------------------------------------|
+bloqueControl ::= bloqueCod 
+                | break
+;
+
+//-------------------------------------------------------- [BREAK] ----------------------------------------------------|
 break ::= BREAK FIN_EXPRESION;
 
-// Produccion de RETURN
+//-------------------------------------------------------- [RETURN] ----------------------------------------------------|
 return ::= RETURN literal:vL
 {:
     String tipoF = listaTablasSimbolos.get(tablaActual).get(tablaActual);
@@ -535,7 +521,7 @@ return ::= RETURN literal:vL
          | RETURN funcion
 ;
 
-// Produccion de condicion
+//-------------------------------------------------------- [CONDICION] ----------------------------------------------------|
 condicion ::= L_BOOLEANO:vBO {: RESULT = vBO.toString(); :}
             | expresion:vEX {: RESULT = vEX.toString(); :}
             | expresion operadorConjuntiva condicion
@@ -545,12 +531,12 @@ condicion ::= L_BOOLEANO:vBO {: RESULT = vBO.toString(); :}
 expresion ::= expresionBinaria:vRes
             | expresionUnaria 
             | expresionRelacion:vER {: RESULT = vER.toString(); :}
-            | expresionNegacion 
+            | expresionNegacion:vEN {: RESULT = vEN.toString(); :} 
             | expresionConjuntiva
             | expresionBinaria operadorRelacional literal
 ;
 
-// Produccion de expresiones relaciones
+//------------------------------------------ [EXPRESIONES RELACIONALES (<><=>=!=)] -----------------------------------------------|
 expresionRelacion ::= operando:vOPL operadorRelacional:vOR operando:vOPR {:
     String op1 = vOPL.toString();
     String op2 = vOPR.toString();
@@ -583,34 +569,46 @@ expresionRelacion ::= operando:vOPL operadorRelacional:vOR operando:vOPR {:
                 
 :}
                     
-                    | operando operadorComparacion operando
+                    | operando:vOPL operadorComparacion:vOC operando:vOPR
+{:
+    RESULT = vOPL.toString()+vOC.toString()+vOPR.toString();
+:}
 ;
+
+//-------------------------------------------------------- [OPERADOR RELACIONAL] ----------------------------------------------------|
 operadorRelacional ::= GREATER_THAN {: RESULT = ">"; :}
                      | LESS_THAN {: RESULT = "<"; :}
                      | GREATER_THAN_OR_EQ {: RESULT = ">="; :}
                      | LESS_THAN_OR_EQ {: RESULT = "<="; :}
 ;
 
+//-------------------------------------------------------- [OPERADOR COMPARACION] ----------------------------------------------------|
 operadorComparacion	::= EQEQ {: RESULT = "=="; :}
                       | NOT_EQ {: RESULT = "!="; :}
 ;
 
-// Produccion de expresiones de negacion
-expresionNegacion ::= operadorNegacion operando;
+//-------------------------------------------------------- [EXPRESION NEGACION !] ----------------------------------------------------|
+expresionNegacion ::= operadorNegacion:vOPN operando:vOP
+{:
+    RESULT = vOPN.toString()+vOP.toString();
+:}
+;
 
+//-------------------------------------------------------- [OPERADOR NEGACION] ----------------------------------------------------|
 operadorNegacion ::= NEGACION {: RESULT = "!"; :}
 ;
 
-// Produccion de expresiones unarias
+//-------------------------------------------------------- [EXPRESIONES UNARIAS ++ --] ----------------------------------------------|
 expresionUnaria	::= operando operadorUnario
                   | operadorUnario operando 
 ;
 
+//-------------------------------------------------------- [OPERADOR UNARIO] ----------------------------------------------------|
 operadorUnario	::= MINUSMINUS {: RESULT = "--"; :}
                   | PLUSPLUS {: RESULT = "++"; :}
 ;
 
-// Produccion de expresiones Binarias
+//-------------------------------------------------------- [EXPRESION BINARIO] ----------------------------------------------------|
 expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
 {:
     String op1 = vOPL.toString();
@@ -652,8 +650,6 @@ expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
         }
         RESULT = "0";
     }
-    
-
     else if (verificador.verificarEntero(vOPL) && verificador.verificarEntero(vOPR)) {
 
         int e1 = Integer.parseInt(op1);
@@ -747,23 +743,25 @@ expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
             RESULT = "0";
         }
     }
- /*       
+        
     String temp1 ="t"+t;
-    String var1 = temp1+" = "+vIL.toString()+"\n";
+    String var1 = temp1+" = "+vOPL.toString()+"\n";
     escribirCodigo(var1);
     t++;
     String temp2 ="t"+t;
-    String var2 = temp2+" = "+vIR.toString()+"\n";
+    String var2 = temp2+" = "+vOPR.toString()+"\n";
     escribirCodigo(var2);
     escribirCodigo(temp1+" = "+temp2+"\n");
     t++;
-*/
+
     
 :}
         | PARENTESISABRE expresionBinaria PARENTESISCIERRA
         | operando operadorBinario operando  operadorBinario operando 
         | operando operadorBinario operando  operadorBinario expresionBinaria
 ;
+
+//-------------------------------------------------------- [OPERADOR BINARIO] ----------------------------------------------------|
 operadorBinario ::= PLUS {: RESULT = "+"; :}
                   | MINUS {: RESULT = "-"; :}
                   | DIVI {: RESULT = "/"; :}
@@ -772,11 +770,15 @@ operadorBinario ::= PLUS {: RESULT = "+"; :}
                   | MODULO {: RESULT = "~"; :}
 ;
 
-// Produccion de expresiones Conjuntivas
-expresionConjuntiva	::= operando operadorConjuntiva operando;
-operadorConjuntiva	::= CONJUNCION {: RESULT = "^"; :}
+//-------------------------------------------------------- [EXPRESION CONJUNTIVA] ----------------------------------------------------|
+expresionConjuntiva ::= operando operadorConjuntiva operando;
+
+//-------------------------------------------------------- [OPERADOR CONJUNTIVA] ----------------------------------------------------|
+operadorConjuntiva ::= CONJUNCION {: RESULT = "^"; :}
                           | DISYUNCION {: RESULT = "#"; :}
 ;
+
+//-------------------------------------------------------- [OPERANDO] ----------------------------------------------------|
 operando ::= literal:vL {: RESULT = vL; :} 
            | Identificador:vI
 {: 
@@ -790,13 +792,13 @@ operando ::= literal:vL {: RESULT = vL; :}
 ;
 //--------------------------------------------------------------------------------------------------------------------------|
 
-// Produccion de los tipos de funcion
+//-------------------------------------------------------- [TIPO FUNCION] ----------------------------------------------------|
 tipoFuncion ::=  INT {: RESULT = "int"; :}
                | BOOL {: RESULT = "boolean"; :}
                | FLOAT {: RESULT = "float"; :}
 ;
 
-// Produccion de los tipos de variables
+//-------------------------------------------------------- [TIPO VARIABLES] ----------------------------------------------------|
 tipoVariable ::= INT {: RESULT = "int"; :} 
                | BOOL {: RESULT = "boolean"; :} 
                | FLOAT {: RESULT = "float"; :} 
@@ -804,7 +806,7 @@ tipoVariable ::= INT {: RESULT = "int"; :}
                | STRING:s {: RESULT = "string"; :} 
 ;
 
-// Produccion de los literales
+//-------------------------------------------------------- [LITERALES] ----------------------------------------------------|
 literal ::= L_ENTERO:l_E {: RESULT = l_E; :}
           | L_FLOTANTE:l_F {: RESULT = l_F; :}
           | L_BOOLEANO:l_B {: RESULT = l_B; :}

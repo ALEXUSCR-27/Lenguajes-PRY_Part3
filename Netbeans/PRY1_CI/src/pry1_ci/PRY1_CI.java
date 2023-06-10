@@ -46,14 +46,14 @@ public class PRY1_CI {
                     case "1":
                         Limpiar();
                         probarLexer();
-                        System.out.print("\nPresione cualquier tecla para continuar...............");
+                        System.out.print("\nPresione ENTER para continuar...............");
                         scanner.nextLine();
                         Menu();
                         break;
                     case "2":
                         Limpiar();
                         probarParser();
-                        System.out.print("\nPresione cualquier tecla para continuar...............");
+                        System.out.print("\nPresione ENTER para continuar...............");
                         scanner.nextLine();
                         Menu();
                         break;

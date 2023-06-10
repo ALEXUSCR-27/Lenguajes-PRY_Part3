@@ -1,5 +1,21 @@
 main_:
 miChar = !
 str1 = Mi string 1
+t0 = 45.6
+t1 = 76.8
+t0 = t1
 arr[10] = {}
 arr2[3] = {}
+t2 = 5
+t3 = 5
+t2 = t3
+f = as
+miOtraFun_:
+x22 = 10
+ch33 = a
+if (x22<=45) goto L0
+goto L1
+L0:
+str2 = sdff
+t4 = -5.6
+return t4
