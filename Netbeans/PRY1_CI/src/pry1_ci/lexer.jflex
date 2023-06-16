@@ -86,8 +86,6 @@ FlotanteN = - ({FlotanteC}|{FlotanteP})
 <YYINITIAL> "char" {return symbol(sym.CHAR);}
 
 
-<YYINITIAL> "@" {return symbol(sym.COMENTARIO);}
-
 
 /*Control*/
 <YYINITIAL> "if" {return symbol(sym.IF);}

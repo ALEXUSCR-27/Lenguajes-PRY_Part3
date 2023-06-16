@@ -1,0 +1,55 @@
+
+
+float func1(char x22, char x22){@semantico borrar parámetro
+	char x22$ @semantico x22
+	if (x22 <= 45 # var > 5.6){ @semantico x22, var
+		int y$
+		x22 = 10$
+		char ch33 = 'a'$
+	} else {
+		int y$ @no error duplicado en if-else
+		string str2 = "sdff"$
+	}
+        int y = 34 + 12$
+        int x = 10 - 1$
+        float h = 23.2 + 12.7$
+
+	return -5.6$ @cambio en retorno genera semantico
+}
+
+boolean func2(boolean b1, int i1){
+	return -5.6$ @generar error con -5.6 y con i1
+}
+
+string func3(string b1){ @semantico string
+	return 1$ 
+}
+
+
+
+int main(){
+/_
+Comentario 1
+_/
+	char miChar = '!'$
+	char miChar2 = '!'$ @semantico
+	string str1 = "Mi string 1"$
+	float fl1$
+	float fl1 = 56.6$ @semantico fl1
+	int in1 = --fl1 * -14 / ++in1 + 7 - 15$ @semantico fl1, in1
+	float fl2 = 3.7 ** fl1 + (45.6 ~ 76)$ @semantico literal 76
+	int arr[2]$
+	@int arr[2] = {4,5,6}$ @posible semantico
+	arr[1] = "str"$ @semantico tipo
+	char arr2[3]$
+
+@comentario 2
+
+	arr[0] = 5 * 5$
+	arr[1] = 10 - arr[0] * func1 (hola, true, "hola mundo", 4.5, 'a')$ @semantico func1, retorno func1
+	fl1 = 4.5~miChar**-0.005$ @semantico miChar
+	miFunc (hola, 'a')$ @semantico miFunc, hola
+	boolean bl0 = 6.7 != 8.9$ @ok
+	boolean bl1 = in1 >= fl1 # false$ @semantico in1 >= fl1, func2
+	return bl1$ @semantico
+}

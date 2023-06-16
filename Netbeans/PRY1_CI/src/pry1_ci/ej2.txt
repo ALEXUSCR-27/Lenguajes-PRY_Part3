@@ -1,26 +1,15 @@
- 
-int main(){
-	read(miInt2)$
-	sysPrint("hola")$
-	sysPrint(34)$
-	sysPrint(-6.7)$
-	return 1$
+
+int main () {
+    float num= funcB(201.0)$
+    print(num)$
+    return 0$@salida del sistema
 }
 
-float miFunc (int dif, char otra){
-	int otra$
-	string str = "Hola $%&/#$&) mundo"$
-	for(int i=0$i>10$++i)
-	{
-            if (otra>10)
-            {
-                return 0$
-            }
-		
-	}
-	return 1$ @error
-}
-
-boolean miOtraFun(){
-	return -5.6$ @error
+floatfuncB(floatnum){ 
+    if (num> 100.0) {
+        num = funcB(num –50.0)$
+        return num$
+    }else {
+        return num$
+    }
 }

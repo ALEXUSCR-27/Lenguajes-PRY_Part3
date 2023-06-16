@@ -1,21 +1,55 @@
-main_:
-miChar = !
-str1 = Mi string 1
-t0 = 45.6
-t1 = 76.8
-t0 = t1
-arr[10] = {}
-arr2[3] = {}
-t2 = 5
-t3 = 5
-t2 = t3
-f = as
-miOtraFun_:
+func1_:
 x22 = 10
 ch33 = a
-if (x22<=45) goto L0
+if (x22<=45#var>5.6) goto L0
 goto L1
 L0:
 str2 = sdff
-t4 = -5.6
-return t4
+t0 = 34
+t1 = 12
+t2 = t0 + t1
+t3 = 34
+t4 = 12
+t3 = t4
+t5 = 10
+t6 = 1
+t7 = t5 - t6
+t8 = 10
+t9 = 1
+t8 = t9
+t10 = 23.2
+t11 = 12.7
+t10 = t11
+t12 = -5.6
+return t12
+func2_:
+t13 = -5.6
+return t13
+main_:
+miChar = !
+miChar2 = !
+str1 = Mi string 1
+fl1 = 56.6
+t14 = fl1
+t15 = -14
+t14 = t15
+t16 = in1
+t17 = 7
+t16 = t17
+t18 = 3.7
+t19 = fl1
+t18 = t19
+t20 = 45.6
+t21 = 76
+t20 = t21
+arr[2] = {}
+arr2[3] = {}
+t22 = 5
+t23 = 5
+t22 = t23
+t24 = 10
+t25 = arr[0]
+t24 = t25
+t26 = 4.5
+t27 = miChar
+t26 = t27

@@ -1,0 +1,52 @@
+
+
+int main(){
+	char miChar = 'a'$ @asdad
+	char miChar2 = 'b'$ 
+	string str1 = "Mi string 1"$
+	float fl3$
+	float fl1 = 56.6$ @sdfsdfsdfsdf
+        int entero = 10$
+	int in1 = entero + -14$ 
+	float fl2 = 45.6 + 7.6$ 
+	int arr[2]$
+	arr[1] = 13**10$
+        arr[0] = func1$
+	char arr2[3]$ @sdgdsdfsdf
+        int a = 10 + 15$
+        int y = fl2$
+        sysRead(fl2)$
+        sysPrint(fl2)$
+	arr[0] = 5$
+	entero = func1(hola,fl1)$ 
+	fl1 = fl1**-0.005+a$ 
+	func1(hola, 'a')$ 
+	boolean bl0 = true != 89$ 
+	boolean bl1 = fl1 ^ fl1$ 
+}
+
+
+ float func1(char x22, char x24) {
+	char x23$
+        int x = 0$
+        int y = 2$
+        int res = 4+10*7+func3("hola")$
+	if (x <= y){ 
+		int ya$
+		x = 10$
+		char ch33 = 'a'$
+	} else {
+		int y2$ 
+		string str2 = "sdff"$
+	}
+
+	return -5.6$ 
+}
+
+boolean func2(boolean b1, int i1){
+	return b1$
+}
+
+int func3(string b1){ 
+	return 1$ 
+}
