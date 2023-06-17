@@ -20,8 +20,8 @@ public class sym {
   public static final int GREATER_THAN_OR_EQ = 35;
   public static final int INT = 15;
   public static final int L_FLOTANTE = 46;
-  public static final int MINUS = 23;
   public static final int FOR = 9;
+  public static final int MINUS = 23;
   public static final int GREATER_THAN = 33;
   public static final int LESS_THAN_OR_EQ = 36;
   public static final int SYS_READ = 18;
@@ -30,8 +30,8 @@ public class sym {
   public static final int L_ENTERO = 45;
   public static final int BOOL = 12;
   public static final int PLUS = 20;
-  public static final int IF = 4;
   public static final int MAIN = 2;
+  public static final int IF = 4;
   public static final int LLAVESCORCHETECIERRA = 40;
   public static final int EOF = 0;
   public static final int MINUSMINUS = 31;
@@ -39,12 +39,12 @@ public class sym {
   public static final int SYS_PRINT = 17;
   public static final int error = 1;
   public static final int COMA = 41;
-  public static final int NEGACION = 28;
   public static final int MODULO = 27;
+  public static final int NEGACION = 28;
   public static final int EQEQ = 19;
   public static final int BREAK = 10;
-  public static final int DIVI = 24;
   public static final int EQ = 21;
+  public static final int DIVI = 24;
   public static final int TIMES = 22;
   public static final int ELSE = 5;
   public static final int NOT_EQ = 25;

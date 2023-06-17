@@ -1,55 +1,74 @@
-func1_:
-x22 = 10
-ch33 = a
-if (x22<=45#var>5.6) goto L0
-goto L1
+func1:
+datachar x22
+datachar x22
+param x22
+datachar x22
+t0 = x22
+t1 = 45
+t2 = t0<=t1
+t3 = var
+t4 = 5.6
+t5 = t3>t4
+if t5 goto L0
+goto if_end0
 L0:
+dataint y
+x22 = 10
+datachar ch33
+ch33 = a
+L0_end
+if_end0
+else_0:
+dataint y
+datastring str2
 str2 = sdff
-t0 = 34
-t1 = 12
-t2 = t0 + t1
-t3 = 34
-t4 = 12
-t3 = t4
-t5 = 10
-t6 = 1
-t7 = t5 - t6
-t8 = 10
-t9 = 1
-t8 = t9
-t10 = 23.2
-t11 = 12.7
-t10 = t11
+else_end0
+dataint y
+t6 = 34
+t7 = 12
+t8 = t6 + t7
+dataint x
+t9 = 10
+t10 = 1
+t11 = t9 - t10
+datafloat h
 t12 = -5.6
 return t12
-func2_:
+func2:
+databoolean b1
+dataint i1
+param i1
 t13 = -5.6
 return t13
-main_:
+main:
+datachar miChar
 miChar = !
+datachar miChar2
 miChar2 = !
+datastring str1
 str1 = Mi string 1
+datafloat fl1
+datafloat fl1
 fl1 = 56.6
+dataint in1
 t14 = fl1
-t15 = -14
-t14 = t15
+t15 = t14*-14
 t16 = in1
-t17 = 7
-t16 = t17
-t18 = 3.7
-t19 = fl1
-t18 = t19
-t20 = 45.6
-t21 = 76
-t20 = t21
+t17 = t16+7
+datafloat fl2
+dataint arr
 arr[2] = {}
+datachar arr2
 arr2[3] = {}
-t22 = 5
-t23 = 5
-t22 = t23
-t24 = 10
-t25 = arr[0]
-t24 = t25
-t26 = 4.5
-t27 = miChar
-t26 = t27
+t18 = a
+param t18
+t19 = a
+param t19
+databoolean bl0
+databoolean bl1
+t20 = in1
+t21 = fl1
+t22 = t20>=t21
+t23 = bl1
+return t23
+main_end

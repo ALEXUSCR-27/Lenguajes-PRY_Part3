@@ -1,13 +1,13 @@
 
 int main () {
-    float num= funcB(201.0)$
-    print(num)$
+    float num = funcB(201.0)$
+    sysPrint(num)$
     return 0$@salida del sistema
 }
 
-floatfuncB(floatnum){ 
+float funcB(float num){ 
     if (num> 100.0) {
-        num = funcB(num –50.0)$
+        num = funcB(num - 50.0)$
         return num$
     }else {
         return num$
