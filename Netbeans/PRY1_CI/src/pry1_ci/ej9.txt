@@ -1,0 +1,12 @@
+int main() {
+    int x = 10$
+    int y = 12$
+    int res = x + y$
+    sysPrint(res)$
+
+    int f = 123$
+    int d = 23$
+    int res2 = f + d$
+    sysPrint(res2)$
+    return res$
+}

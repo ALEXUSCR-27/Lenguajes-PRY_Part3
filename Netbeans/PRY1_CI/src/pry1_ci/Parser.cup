@@ -17,7 +17,7 @@ import pry1_ci.VerificadorTipos;
 action code {:
     LexerAS scanner;
     
-    
+   
     HashMap<String, HashMap<String, String>> listaTablasSimbolos = new HashMap<String, HashMap<String, String>>();
     String tablaActual;
     ArrayList<String> llamadasFunciones = new ArrayList<String>();
@@ -92,15 +92,13 @@ action code {:
 
 :}
 
-
-
 parser code  {: 
     public LexerAS scanner;
     public parser(LexerAS scanner) {
         super(scanner);
         this.scanner = scanner;
     }
-    
+     int banderaErrores = 0;
 
     // Funcion para reportar errores sintacticos
     public void report_error(String message, Object info) {
@@ -116,6 +114,7 @@ parser code  {:
         else {
             System.err.println("Error [SINTAXIS DESCONOCIDA]");
         }
+        banderaErrores = 1;
         
     }
 
@@ -123,13 +122,17 @@ parser code  {:
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
     }
+
+    public int getBanderaErrores() {
+        return banderaErrores;
+    }
   
  
 :};
 
 
 init with {: action_obj.scanner = scanner;:};
-//scan with {: return scanner.next_token(); :};
+
 
 // Terminales
 terminal MAIN;
@@ -202,13 +205,19 @@ precedence left FIN_EXPRESION;
 precedence left INT;
 
 
-
+//PRODUCCION DE INICIO
 start with inicio;
 
 //-------------------------------------------------------- [INICIO] ----------------------------------------------------|
 inicio ::= programa {:
-    if(!existeMain()) System.err.println("Error semantico [INEXISTENCIA DE FUNCION PRINCIPAL MAIN]");
-    if (!revisarLlamadas()) {System.err.println("Error semantico -> llamadas a funciones no declaradas");}
+    if(!existeMain()) {
+        System.err.println("Error semantico [INEXISTENCIA DE FUNCION PRINCIPAL MAIN]");
+        banderaErrores = 1;
+    }
+    if (!revisarLlamadas()) {
+        System.err.println("Error semantico -> llamadas a funciones no declaradas");
+        banderaErrores = 1;
+    }
     Thread.sleep(500);
     imprimirTabla();
 :};
@@ -231,7 +240,7 @@ bloqueCod ::= sentencia
             | return FIN_EXPRESION
             | sentencia bloqueCod
             | estructControl bloqueCod
-            | error {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()) ; :} FIN_EXPRESION 
+            | error {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()) ; banderaErrores = 1;:} FIN_EXPRESION 
 ;   
 
 
@@ -246,7 +255,7 @@ sentencia ::= crearVariable FIN_EXPRESION
             | funcion FIN_EXPRESION
             | entradaEst:vET FIN_EXPRESION
             | salidaEst FIN_EXPRESION
-            | error  FIN_EXPRESION {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()); :}
+            | error  FIN_EXPRESION {: System.err.println("Error sintactico en la linea "+scanner.getYYLine()); banderaErrores = 1;:}
           
           
 ;
@@ -256,7 +265,11 @@ crearVariable ::= tipoVariable:vTV Identificador:vID
                    {:
                         String tipo = vTV.toString();
                         String ID = vID.toString();
-                        if (existeVar(ID, listaTablasSimbolos.get(tablaActual))) System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [REPETICION DE VARIABLE] -> "+ID);
+                        if (existeVar(ID, listaTablasSimbolos.get(tablaActual))) {
+                            System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [REPETICION DE VARIABLE] -> "+ID);
+                            banderaErrores = 1;
+                        }
+
                         listaTablasSimbolos.get(tablaActual).put(ID, tipo);
                         RESULT = vID;
                         escribirCodigo("data"+vTV.toString()+" "+vID.toString()+"\n");
@@ -272,20 +285,33 @@ crearAsignarVariable ::= crearVariable:vID EQ literal:vL
     String tipo = listaTablasSimbolos.get(tablaActual).get(vID).toString();
     String valor = vL.toString();
     
-    if (!verificador.opciones(tipo, valor, vL)) {System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [ASIGNACION DE VARIABLE INVALIDA]");}
+    if (!verificador.opciones(tipo, valor, vL)) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [ASIGNACION DE VARIABLE INVALIDA]");
+        banderaErrores = 1;
+    }
+
     String msg = vID.toString()+" = "+vL.toString()+"\n";
     escribirCodigo(msg);
  :}
                        | crearVariable:vID EQ expresion:vEX
+{:
+//  GENERACION DE CODIGO INTERMEDIO
+    escribirCodigo(vID.toString()+" = t"+(t-1)+"\n");
+//
+:}
 
-                       | crearVariable:vID EQ Identificador:vI
+                       | crearVariable:vID EQ Identificador:vI // CREACION Y ASIGNACION DE VARIABLE = VARIABLE
 {:
     String tipo = listaTablasSimbolos.get(tablaActual).get(vID).toString();
     String valor = vI.toString();
-    if (!existeVar(valor, listaTablasSimbolos.get(tablaActual))) System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [NO EXISTE LA VARIABLE]");
+    if (!existeVar(valor, listaTablasSimbolos.get(tablaActual))) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [NO EXISTE LA VARIABLE]");
+        banderaErrores = 1;
+    }
 
     else if (!(listaTablasSimbolos.get(tablaActual).get(valor)).equals(tipo)) {
         System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [ASIGNACION DE VARIABLE INVALIDA]");
+        banderaErrores = 1;
     }
 
 //  GENERACION DE CODIGO INTERMEDIO
@@ -316,6 +342,7 @@ crearAsignarVariable ::= crearVariable:vID EQ literal:vL
 asignarVariable	::= Identificador:vID EQ literal:vL 
 {: if (!existeVar(vID.toString(), listaTablasSimbolos.get(tablaActual))) {
        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [NO EXISTE LA VARIABLE]");
+       banderaErrores = 1;
     }
     else {
         String tipo = listaTablasSimbolos.get(tablaActual).get(vID.toString());
@@ -330,6 +357,7 @@ asignarVariable	::= Identificador:vID EQ literal:vL
 
         if (!tipo.equals(tipoL)) {
             System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [ASIGNACION DE VARIABLE INVALIDA]");
+            banderaErrores = 1;
         }
     }
     String msg = vID.toString()+" = "+vL.toString()+"\n";
@@ -342,10 +370,14 @@ asignarVariable	::= Identificador:vID EQ literal:vL
     if (existeVar(vIL.toString(), listaTablasSimbolos.get(tablaActual)) && existeVar(vIR.toString(), listaTablasSimbolos.get(tablaActual))) {
         String tipo1 = listaTablasSimbolos.get(tablaActual).get(vIL.toString());
         String tipo2 = listaTablasSimbolos.get(tablaActual).get(vIR.toString());
-        if(!tipo1.equals(tipo2)) System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [ASIGNACION DE VARIABLE INVALIDA]");
+        if (!tipo1.equals(tipo2)) {
+            System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [ASIGNACION DE VARIABLE INVALIDA]");
+            banderaErrores = 1;
+        }
     }
     else {
         System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [NO EXISTE LA VARIABLE]");
+        banderaErrores = 1;
     }
     String temp1 ="t"+t;
     String var1 = temp1+" = "+vIL.toString()+"\n";
@@ -374,6 +406,7 @@ crearArreglo ::= crearVariable:vID arreglo:vAR
     String tipo = listaTablasSimbolos.get(tablaActual).get(vID.toString());
     if (!tipo.equals("int") && !tipo.equals("char")) {
         System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [ARREGLO ILEGAL]");
+        banderaErrores = 1;
     }
     String msg = vID.toString()+vAR.toString()+" = {}\n";
     escribirCodigo(msg);
@@ -402,6 +435,7 @@ asignarElementoArreglo	::= elementoArreglo:vEL  EQ literal:vL
     }
     else {
         System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [ASIGNACION DE ARREGLO ILEGAL]");
+        banderaErrores = 1;
     } 
 :}
                           | elementoArreglo EQ expresionBinaria
@@ -434,6 +468,7 @@ funcion	::= Identificador:vID PARENTESISABRE PARENTESISCIERRA
 {:
     RESULT = vID;
     llamadasFunciones.add(vID.toString());
+    
 :} 
 ;
 
@@ -442,16 +477,21 @@ crearFuncion ::= tipoIDFun:vID PARENTESISABRE PARENTESISCIERRA LLAVESCORCHETEABR
 {:
     escribirCodigo(vID.toString()+"_end\n");
 :}
-               | tipoIDFun PARENTESISABRE Identificador PARENTESISCIERRA LLAVESCORCHETEABRE bloqueCod LLAVESCORCHETECIERRA 
+               //| tipoIDFun PARENTESISABRE Identificador PARENTESISCIERRA LLAVESCORCHETEABRE bloqueCod LLAVESCORCHETECIERRA 
                | tipoIDFun PARENTESISABRE literal  PARENTESISCIERRA LLAVESCORCHETEABRE bloqueCod LLAVESCORCHETECIERRA
-               | tipoIDFun PARENTESISABRE crearParametro  PARENTESISCIERRA LLAVESCORCHETEABRE bloqueCod LLAVESCORCHETECIERRA
-               //| error {:System.err.println("Error sintactico en la linea "+scanner.getYYLine()+" [CREACION DE FUNCION]");:} FIN_EXPRESION
+               | tipoIDFun:vID PARENTESISABRE crearParametro  PARENTESISCIERRA LLAVESCORCHETEABRE bloqueCod LLAVESCORCHETECIERRA
+{:
+    escribirCodigo(vID.toString()+"_end\n");
+:}
 ;
 
 //-------------------------------------------------------- [TIPO Y ID DE FUNCION] ----------------------------------------------------|
 tipoIDFun ::= tipoFuncion:vTF Identificador:vID 
 {:
-    if (existeFuncion(vID.toString())) {System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [REPETICION DE FUNCION]");}
+    if (existeFuncion(vID.toString())) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [REPETICION DE FUNCION]");
+        banderaErrores = 1;
+    }
     tablaActual = "Tabla:"+vID.toString(); 
     HashMap<String, String> datosFuncion = new HashMap<String, String>();
     datosFuncion.put(tablaActual, vTF.toString());
@@ -472,7 +512,10 @@ tipoIDFun ::= tipoFuncion:vTF Identificador:vID
 // -----------------------------------------------[PRODUCCION DE PARAMETROS]----------------------------------------------|
 parametro ::= Identificador:vID
 {: 
-    if (!existeVar(vID.toString(), listaTablasSimbolos.get(tablaActual))) System.err.println("Error semantico en la linea "+scanner.getYYLine()+", no existe la variable -> "+vID.toString());
+    if (!existeVar(vID.toString(), listaTablasSimbolos.get(tablaActual))) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+", no existe la variable -> "+vID.toString());
+        banderaErrores = 1;
+    }
     RESULT = vID;
     param++;
 :}
@@ -511,6 +554,7 @@ entradaEst ::= SYS_READ PARENTESISABRE Identificador:vID PARENTESISCIERRA
     String tipoID = listaTablasSimbolos.get(tablaActual).get(vID.toString());
     if (!tipoID.equals("int") && !tipoID.equals("float")) {
         System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [*SYSREAD ERROR* VARIABLE ILEGAL (ENTERO O FLOTANTE)]");
+        banderaErrores = 1;
     }
 :}
 ;
@@ -519,18 +563,26 @@ entradaEst ::= SYS_READ PARENTESISABRE Identificador:vID PARENTESISCIERRA
 salidaEst ::= SYS_PRINT PARENTESISABRE Identificador:vID PARENTESISCIERRA
 
 {:
-    if (!existeVar(vID.toString(), listaTablasSimbolos.get(tablaActual))) System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [NO EXISTE LA VARIABLE]");
+    if (!existeVar(vID.toString(), listaTablasSimbolos.get(tablaActual))) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [NO EXISTE LA VARIABLE]");
+        banderaErrores = 1;
+    }
     String tipoID = listaTablasSimbolos.get(tablaActual).get(vID.toString());
-    if (!tipoID.equals("string") && !tipoID.equals("int") && !tipoID.equals("float")) System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [IMPRESION ILEGAL]");
-    //  escribirCodigo("print t"+t);
+    if (!tipoID.equals("string") && !tipoID.equals("int") && !tipoID.equals("float")) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [IMPRESION ILEGAL]");
+        banderaErrores = 1;
+    }
+    escribirCodigo("print "+vID.toString()+"\n");
 
 :}
  
             | SYS_PRINT PARENTESISABRE literal:vL PARENTESISCIERRA
 {:
-    if (!verificador.verificarEntero(vL) && !verificador.verificarFloat(vL) && !verificador.verificarString(vL)) 
-    System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [IMPRESION ILEGAL]");
-    escribirCodigo("print t"+t);
+    if (!verificador.verificarEntero(vL) && !verificador.verificarFloat(vL) && !verificador.verificarString(vL)) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [IMPRESION ILEGAL]");
+        banderaErrores = 1;
+    }
+    escribirCodigo("print t"+t+"\n");
 :}
 ;
 
@@ -544,6 +596,7 @@ estructControl ::= if
                 | error 
 {: 
 System.err.println("Error sintactico en la linea "+scanner.getYYLine());
+banderaErrores = 1;
 :} sentencia              
 ;
 
@@ -608,7 +661,10 @@ return ::= RETURN literal:vL
     if (verificador.verificarChar(vL)) tipoL = "char";
     if (verificador.verificarString(vL)) tipoL = "string";
     System.out.println(tipoL);
-    if (!tipoF.equals(tipoL)) System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [RETURN ILEGAL]");
+    if (!tipoF.equals(tipoL)) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [RETURN ILEGAL]");
+        banderaErrores = 1;
+    }
     String temp1 = "t"+t;
     t++;
     String var1 = temp1+" = "+vL.toString()+"\n";
@@ -619,11 +675,17 @@ return ::= RETURN literal:vL
          | RETURN expresion
          | RETURN Identificador:vID
 {: 
-    if (!existeVar(vID.toString(), listaTablasSimbolos.get(tablaActual))) System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [RETURN ILEGAL]");
+    if (!existeVar(vID.toString(), listaTablasSimbolos.get(tablaActual))) {
+        System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [RETURN ILEGAL]");
+        banderaErrores = 1;
+    }
     else {
         String tipoV = listaTablasSimbolos.get(tablaActual).get(vID.toString());
         String tipoF = listaTablasSimbolos.get(tablaActual).get(tablaActual);
-        if (!tipoV.equals(tipoF)) System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [RETURN ILEGAL]");
+        if (!tipoV.equals(tipoF)) {
+            System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [RETURN ILEGAL]");
+            banderaErrores = 1;
+        }
     }
     String temp1 = "t"+t;
     t++;
@@ -666,10 +728,14 @@ expresionRelacion ::= operando:vOPL operadorRelacional:vOR operando:vOPR {:
             String tipo = listaTablasSimbolos.get(tablaActual).get(op1);
             if ((!tipo.equals("int") && !tipo.equals("float"))) {
                 System.err.println("Error semantico en la linea  "+scanner.getYYLine()+ " [OPERACION RELACIONAL INVALIDA]");
+                banderaErrores = 1;
             }
             
         }
-        else {System.err.println("Error semantico en la linea  "+scanner.getYYLine()+ " [OPERACION RELACIONAL INVALIDA]");}
+        else {
+            System.err.println("Error semantico en la linea  "+scanner.getYYLine()+ " [OPERACION RELACIONAL INVALIDA]");
+            banderaErrores = 1;
+        }
         
     } 
     else if (verificador.verificarString(vOPR)) {
@@ -677,15 +743,19 @@ expresionRelacion ::= operando:vOPL operadorRelacional:vOR operando:vOPR {:
             String tipo = listaTablasSimbolos.get(tablaActual).get(op2);
             if ((!tipo.equals("int") && !tipo.equals("float"))) {
                 System.err.println("Error semantico en la linea  "+scanner.getYYLine()+ " [OPERACION RELACIONAL INVALIDA]");
+                banderaErrores = 1;
             }
         
         }
-        else{System.err.println("Error semantico en la linea  "+scanner.getYYLine()+ " [OPERACION RELACIONAL INVALIDA]");}
+        else {
+            System.err.println("Error semantico en la linea  "+scanner.getYYLine()+ " [OPERACION RELACIONAL INVALIDA]");
+            banderaErrores = 1;
+        }
     }
     else {
         if (!verificador.verificarEntero(vOPL) || !verificador.verificarBooleano(vOPL) && !verificador.verificarEntero(vOPR) || !verificador.verificarBooleano(vOPR)) { 
             System.err.println("Error semantico en la linea  "+scanner.getYYLine()+ " [OPERACION RELACIONAL INVALIDA]");
-            
+            banderaErrores = 1;
         }
     }
     String temp1 = "t"+t;
@@ -696,7 +766,7 @@ expresionRelacion ::= operando:vOPL operadorRelacional:vOR operando:vOPR {:
     escribirCodigo(temp2+" = "+op2+"\n");
     String temp3 = "t"+t;
     t++;
-    escribirCodigo(temp3+" = "+temp1+vOR.toString()+temp2+"\n");
+    escribirCodigo(temp3+" = "+temp1+" "+vOR.toString()+" "+temp2+"\n");
     
     RESULT = op1+vOR.toString()+op2;
     
@@ -765,18 +835,19 @@ expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
         if (tipo1.equals(tipo2)) {
             String temp1 = "t"+t;
             t++;
-            escribirCodigo(temp1+" = "op1+"\n");
+            escribirCodigo(temp1+" = "+op1+"\n");
 
             String temp2 = "t"+t;
             t++;
-            escribirCodigo(temp2+" = "op2+"\n");
+            escribirCodigo(temp2+" = "+op2+"\n");
 
             String temp3 = "t"+t;
             t++;
-            escribirCodigo(temp3+" = "+temp1+vOB.toString()+temp2+"\n");
+            escribirCodigo(temp3+" = "+temp1+" "+vOB.toString()+" "+temp2+"\n");
         }
         else {
             System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [OPERACION ILEGAL]");
+            banderaErrores = 1;
         }
         RESULT = "0";
     }
@@ -787,13 +858,14 @@ expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
             if (verificador.verificarFloat(vOPR)) tipo = "float";
             if(!(listaTablasSimbolos.get(tablaActual).get(op1)).equals(tipo)) {
                 System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [OPERACION ILEGAL]");
+                banderaErrores = 1;
             }
             String temp1 = "t"+t;
             t++;
             escribirCodigo(temp1+" = "+op1+"\n");
             String temp2 = "t"+t;
             t++;
-            escribirCodigo(temp2+" = "+temp1+vOB.toString()+op2+"\n");
+            escribirCodigo(temp2+" = "+temp1+" "+vOB.toString()+" "+op2+"\n");
         }
         if (verificador.verificarString(vOPR)) {
             
@@ -802,13 +874,14 @@ expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
                 if (verificador.verificarFloat(vOPL)) tipo = "float";
                 if(!(listaTablasSimbolos.get(tablaActual).get(op1)).equals(tipo)) {
                     System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [OPERACION ILEGAL]");
+                    banderaErrores = 1;
                 }
                 String temp1 = "t"+t;
                 t++;
                 escribirCodigo(temp1+" = "+op2+"\n");
                 String temp2 = "t"+t;
                 t++;
-                escribirCodigo(temp2+" = "+op1+vOB.toString()+temp1+"\n");
+                escribirCodigo(temp2+" = "+op1+" "+vOB.toString()+" "+temp1+"\n");
             }
 
         }
@@ -851,24 +924,68 @@ expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
           
         }
         if (op3.equals("*")) {
-          
-                RESULT = e1*e2;
+            String temps ="t"+t;
+            String vars1 = temps+" = "+op1+"\n";
+            escribirCodigo(vars1);
+            t++;
+            String temps2 ="t"+t;
+            String vars2 = temps2+" = "+op2+"\n";
+            escribirCodigo(vars2);
+            t++;
+            String temps3 ="t"+t;
+            escribirCodigo(temps3+" = "+temps+" * "+temps2+"\n");
+            t++;
+            RESULT = e1*e2;
         }
         if (op3.equals("/")) {
                 if (e2 != 0) {
+                    String temps ="t"+t;
+                    String vars1 = temps+" = "+op1+"\n";
+                    escribirCodigo(vars1);
+                    t++;
+                    String temps2 ="t"+t;
+                    String vars2 = temps2+" = "+op2+"\n";
+                    escribirCodigo(vars2);
+                    t++;
+                    String temps3 ="t"+t;
+                    escribirCodigo(temps3+" = "+temps+" / "+temps2+"\n");
+                    t++;
                     RESULT = e1/e2;
                 }
                 else {
                     System.err.println("Error semantico en la linea "+scanner.getYYLine()+ " [OPERACION ILEGAL]");
+                    banderaErrores = 1;
                     RESULT = "0";
                 }
         }
         
                 
         if (op3.equals("**")) {
-                RESULT = Math.pow(e1,e2);
+            String temps ="t"+t;
+            String vars1 = temps+" = "+op1+"\n";
+            escribirCodigo(vars1);
+            t++;
+            String temps2 ="t"+t;
+            String vars2 = temps2+" = "+op2+"\n";
+            escribirCodigo(vars2);
+            t++;
+            String temps3 ="t"+t;
+            escribirCodigo(temps3+" = "+temps+" ** "+temps2+"\n");
+            t++;
+            RESULT = Math.pow(e1,e2);
         }
         if (op3.equals("%")){
+            String temps ="t"+t;
+            String vars1 = temps+" = "+op1+"\n";
+            escribirCodigo(vars1);
+            t++;
+            String temps2 ="t"+t;
+            String vars2 = temps2+" = "+op2+"\n";
+            escribirCodigo(vars2);
+            t++;
+            String temps3 ="t"+t;
+            escribirCodigo(temps3+" = "+temps+" % "+temps2+"\n");
+            t++;
                 RESULT = e1%e2;
         }
         
@@ -892,6 +1009,7 @@ expresionBinaria ::= operando:vOPL operadorBinario:vOB operando:vOPR
                     }
                     else {
                         System.err.println("Error semantico en la linea "+scanner.getYYLine()+ " [OPERACION ILEGAL]");
+                        banderaErrores = 1;
                         RESULT = "0";
                     }
                 case "**":
@@ -952,6 +1070,7 @@ operando ::= literal:vL {: RESULT = vL; :}
     if (existeVar(vI.toString(), listaTablasSimbolos.get(tablaActual))) RESULT = vI;
     else { 
         System.err.println("Error semantico en la linea "+scanner.getYYLine()+" [NO EXISTE LA VARIABLE]");
+        banderaErrores = 1;
         RESULT = vI.toString();
     }
 :} 

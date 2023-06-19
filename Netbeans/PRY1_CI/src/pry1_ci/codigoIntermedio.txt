@@ -1,74 +1,33 @@
-func1:
-datachar x22
-datachar x22
-param x22
-datachar x22
-t0 = x22
-t1 = 45
-t2 = t0<=t1
-t3 = var
-t4 = 5.6
-t5 = t3>t4
+main:
+dataint num
+t0 = 201
+param t0
+t1 = call funcB,1
+num = t1
+print num
+t2 = 0
+return t2
+main_end
+funcB:
+dataint num
+param num
+t3 = num
+t4 = 100
+t5 = t3 > t4
 if t5 goto L0
 goto if_end0
 L0:
-dataint y
-x22 = 10
-datachar ch33
-ch33 = a
+t6 = num
+t7 = t6 - 50
+param t7
+t8 = call funcB,1
+num = t8
+t9 = num
+return t9
 L0_end
 if_end0
 else_0:
-dataint y
-datastring str2
-str2 = sdff
+t10 = num
+return t10
 else_end0
-dataint y
-t6 = 34
-t7 = 12
-t8 = t6 + t7
-dataint x
-t9 = 10
-t10 = 1
-t11 = t9 - t10
-datafloat h
-t12 = -5.6
-return t12
-func2:
-databoolean b1
-dataint i1
-param i1
-t13 = -5.6
-return t13
-main:
-datachar miChar
-miChar = !
-datachar miChar2
-miChar2 = !
-datastring str1
-str1 = Mi string 1
-datafloat fl1
-datafloat fl1
-fl1 = 56.6
-dataint in1
-t14 = fl1
-t15 = t14*-14
-t16 = in1
-t17 = t16+7
-datafloat fl2
-dataint arr
-arr[2] = {}
-datachar arr2
-arr2[3] = {}
-t18 = a
-param t18
-t19 = a
-param t19
-databoolean bl0
-databoolean bl1
-t20 = in1
-t21 = fl1
-t22 = t20>=t21
-t23 = bl1
-return t23
-main_end
+funcB_end

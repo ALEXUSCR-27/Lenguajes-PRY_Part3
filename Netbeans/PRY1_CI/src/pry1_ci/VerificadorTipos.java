@@ -13,9 +13,9 @@ public class VerificadorTipos {
     public VerificadorTipos(){}
     
     /**
-     * @param String tipo
-     * @param String valor
-     * @param Object valor2
+     * @param tipo
+     * @param valor
+     * @param valor2
      * @return Valor Booleano
      * Funcion para redirigir a alguna de las verificaciones
      */
@@ -43,7 +43,7 @@ public class VerificadorTipos {
     }
     
     /**
-     * @param String valor
+     * @param valor
      * @return Valor Booleano
      * Funcion para verificar si una cadena de carateres puede ser entero
      */
@@ -58,7 +58,7 @@ public class VerificadorTipos {
     }
     
     /**
-     * @param String valor
+     * @param valor
      * @return Valor Booleano
      * Funcion para verificar si una cadena de carateres puede ser booleano
      */
@@ -73,7 +73,7 @@ public class VerificadorTipos {
     }
     
     /**
-     * @param Object valor
+     * @param valor
      * @return Valor Booleano
      * Funcion para verificar si un objeto es flotante
      */
@@ -82,7 +82,7 @@ public class VerificadorTipos {
     }
     
     /**
-     * @param Object valor
+     * @param valor
      * @return Valor Booleano
      * Funcion para verificar si un objeto puede ser char
      */
@@ -92,7 +92,7 @@ public class VerificadorTipos {
     }
     
     /**
-     * @param Object valor
+     * @param valor
      * @return Valor Booleano
      * Funcion para verificar si un objeto puede ser String
      */
