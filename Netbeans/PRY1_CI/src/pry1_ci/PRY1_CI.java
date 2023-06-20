@@ -250,6 +250,7 @@ public class PRY1_CI {
             String nombreFinal = nombreArchivo.substring(0, lastIndex) + ".asm";
             Files.deleteIfExists(Paths.get(raiz+"\\src/pry1_ci\\"+nombreFinal));
             GeneradorCodigo.generarBloques(rutaCI,nombreFinal);
+            System.out.println("#-------------------------- CODIGO GENERADO CON EXITO --------------------------#");
         }
         else {
             System.err.println("El proceso de compilacion ha presentado errores, el archivo no se puede compilar!!");

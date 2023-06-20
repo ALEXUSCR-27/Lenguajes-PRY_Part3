@@ -36,7 +36,6 @@ public class GeneradorCodigo {
         int bandera = 1;
         ArrayList datosFuncion = new ArrayList<String>();
         while((linea = lector.readLine())!=null) {
-            //System.out.println(funcionInicial);
             if (bandera == 1) {
                 funcionInicial = linea.split(":")[0];
                 finFuncionIni = funcionInicial+"_end";
@@ -52,10 +51,7 @@ public class GeneradorCodigo {
                 datosFuncion.add(linea);
             }
         }
-        //System.out.println(listaBloques);
         escribirBloques(listaBloques);
-        
-        
     }
     
     /**
@@ -69,13 +65,20 @@ public class GeneradorCodigo {
         FileWriter escritor = new FileWriter(archivoMips, true);
         String data = "\n.data\n";
         escritor.write(".text\n");
-        ArrayList<String> variables = new ArrayList<String>();
-        ArrayList<String> parametros = new ArrayList<String>();
+        String condicion = "";
+        boolean salto = false;
+        int punteroLista = 0;
+        ArrayList<String> variables = new ArrayList<>();
+        ArrayList<String> parametros = new ArrayList<>();
+        HashMap<String, String> tablaRegistros = new HashMap<String, String>();
+        int t = 1;
         for (String i:listaBloques.keySet()) {
-            escritor.write(i+":\n");
+            //escritor.write(i+":\n");
+            
             ArrayList<String> listaDatosF = listaBloques.get(i);
             for (String j:listaDatosF) {
                 String[] tokens =j.split(" ");
+               
                 if (j.startsWith("data")) {
                     String variable = j.split(" ")[1];
                     if (!variables.contains(variable)) {
@@ -83,19 +86,46 @@ public class GeneradorCodigo {
                         data+=variable+": .word 0\n";
                     }
                 }
+                if (tokens[0].endsWith(":")) {
+                    escritor.write(tokens[0]+"\n");
+                    if (salto) {
+                        escritor.write("addi $sp, $sp, -4\n");
+                        escritor.write("sw $ra, 0($sp)\n");
+                        salto = false;
+                    }
+                }
+                
                 if (tokens.length == 3) {
-                    if (!tokens[0].startsWith("t")) {
-                        if (tokens[2].startsWith("t")) {
-                            escritor.write("move $t0, $"+tokens[2]+"\n");
+                    String valor = buscarValor(tokens[2], i, listaBloques);
+                    if (!tokens[0].startsWith("t")) { // primer valor es una variable
+                        if (tokens[2].startsWith("t")) { // segundo valor es temporal
+                            if (valor.equals("call")) { // valor de temporal es el res de una funcion
+                                escritor.write("move $t0, $s0\n");
+                            }
+                            //escritor.write("move $t0, $"+tokens[2]+"\n");
                             escritor.write("sw $t0, "+tokens[0]+"\n");
                         }
                         else {
-                            escritor.write("li $t0, "+tokens[2]+"\n");
-                            escritor.write("sw $t0, "+tokens[0]+"\n");
+                            escritor.write("li $t0, "+tokens[2]+"\n"); //t0 = literal
+                            escritor.write("sw $t0, "+tokens[0]+"\n"); //t0 -> num
                         }
                     }
-                    else {
-                        escritor.write("lw $"+tokens[0]+", "+tokens[2]+"\n");
+                    else { //primer valor es un temporal
+
+                       if (t>7) {
+                           t=1;
+                       }
+                        String registro = "$t"+t;
+                        tablaRegistros.put(tokens[0], registro);
+                      
+                        if (!esEntero(tokens[2])) {
+                            escritor.write("lw "+registro+", "+tokens[2]+"\n");
+                        }
+                        else {
+                            escritor.write("li "+registro+", "+tokens[2]+"\n");
+                        }
+                        
+                        t++;
                     }
                     
                 }
@@ -106,24 +136,45 @@ public class GeneradorCodigo {
                     String operando1 = tokens[2];
                     String op = tokens[3];
                     String operando2 = tokens[4];
-                        
+                    String registro1  = "";
+                    String registro2  = "";
+                    if (operando1.startsWith("t")) {
+                        registro1 = tablaRegistros.get(operando1);
+                    }
+                    else {
+                        registro1 = operando1;
+                    }
+                    if (operando2.startsWith("t")) {
+                        registro2 = tablaRegistros.get(operando2);
+                    }
+                    else {
+                        registro2 = operando2;
+                    }
                     if (op.equals("+")) {
-                        escritor.write("addu $"+etiquetaT+", $"+operando1+", $"+operando2+"\n");
-                        /*if (operando1.startsWith("t")) {
-                            String op1 = buscarValor(operando1, i, listaBloques);
-                        }
-                        if (operando2.startsWith("t")) {
-                            String op1 = buscarValor(operando2, i, listaBloques);
-                        }*/
-                            //escritor.write("li "+operando1+", ");
+                        escritor.write("addu $t0, "+registro1+", "+registro2+"\n");
+                        escritor.write("move $s0, $t0\n");
                     }
                     
                     if (op.equals("-")) {
-                        escritor.write("subu $"+etiquetaT+", $"+operando1+", $"+operando2+"\n");
+                        escritor.write("subu $t0, "+registro1+", "+registro2+"\n");
+                        escritor.write("move $s0, $t0\n");
                     }
+                    
+                    if (op.equals("*")) {
+                        escritor.write("mul $t0, "+registro1+", "+registro2+"\n");
+                        escritor.write("move $s0, $t0\n");
+                    }
+                    
+                    if (op.equals("/")) {
+                        escritor.write("div "+registro1+", "+registro2+"\n");
+                        escritor.write("mflo $t0\n");
+                        escritor.write("move $s0, $t0\n");
                         
-                        
-                        System.out.println(op);
+                    }
+                    
+                    if (op.equals(">")) {
+                        condicion = "bgt "+registro1+", "+registro2;
+                    }
                 }
                 
                 if (tokens.length == 2) {
@@ -141,23 +192,45 @@ public class GeneradorCodigo {
                         escritor.write("syscall\n\n");
                     }
                     if (tokens[0].equals("param")) {
-                        parametros.add(tokens[1]);
+                        
+                        if (tokens[1].startsWith("t")) {
+                            parametros.add(tokens[1]);
+                            String registro = tablaRegistros.get(parametros.get(punteroLista));
+                            if (registro != null) {
+                                escritor.write("move $s0, "+registro+"\n");
+                            }
+                        }
+                        else {
+                            
+                            escritor.write("sw $s0, "+tokens[1]+"\n");
+                            punteroLista++;
+                        }
+                    }
+                    if (tokens[0].equals("goto")) {
+                        escritor.write("j "+tokens[1]+"\n");
                     }
                 }
                 
                 if (tokens.length == 4) {
-                    String funcion = tokens[3].split(",")[0];
-                    escritor.write("jal "+funcion+"\n");
+                    if (tokens[2].equals("call")) {
+                        String funcion = tokens[3].split(",")[0];
+                        //escritor.write("li $s0, 0\n");
+                        escritor.write("jal "+funcion+"\n");
+                        salto = true;
+                    }
+                    if (tokens[0].equals("if")) {
+                        condicion+=","+tokens[3]+"\n";
+                        escritor.write(condicion);
+                    }
                 }
-                
-                
-                
-                
-                
-                //System.out.println(j);
+                if (tokens[0].equals("main_end")) {
+                    escritor.write("li $v0, 10\n");
+                    escritor.write("syscall\n");
+                }
+             
             }
+            
             escritor.write(".end "+i+"\n");
-            //System.out.println(i);
         }
         escritor.write(data);
         escritor.close();
@@ -182,6 +255,13 @@ public class GeneradorCodigo {
         return "";
     }
     
-    
+    public static boolean esEntero(String numero) {
+        try {
+            Integer.parseInt(numero);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
     
 }

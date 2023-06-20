@@ -1,8 +1,9 @@
 .text
 main:
-lw $t0, 201
+li $t1, 201
+move $s0, $t1
 jal funcB
-move $t0, $t1
+move $t0, $s0
 sw $t0, num
 
 # IMPRESION DE DATO
@@ -14,28 +15,37 @@ li $a0, 10
 li $v0, 11
 syscall
 
-lw $t2, 0
+li $t2, 0
+lw $ra, 0($sp)
+jr $ra
 li $v0, 10
 syscall
-
 .end main
 funcB:
+addi $sp, $sp, -4
+sw $ra, 0($sp)
+sw $s0, num
 lw $t3, num
-lw $t4, 100
-jal L0
-lw $t6, num
-subu $t7, $t6, $50
+li $t4, 100
+bgt $t3, $t4,L0
+j if_end0
+L0:
+lw $t5, num
+subu $t0, $t5, 50
+move $s0, $t0
 jal funcB
-move $t0, $t8
+move $t0, $s0
 sw $t0, num
-lw $t9, num
-li $v0, 10
-syscall
-
-lw $t10, num
-li $v0, 10
-syscall
-
+lw $t6, num
+lw $ra, 0($sp)
+jr $ra
+if_end0:
+addi $sp, $sp, -4
+sw $ra, 0($sp)
+else_0:
+lw $t7, num
+lw $ra, 0($sp)
+jr $ra
 .end funcB
 
 .data

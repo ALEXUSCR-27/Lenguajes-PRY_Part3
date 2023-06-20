@@ -1991,7 +1991,7 @@ banderaErrores = 1;
           case 71: // NT$3 ::= 
             {
               Object RESULT =null;
-escribirCodigo("if_end"+l+"\n");l++;
+escribirCodigo("if_end"+l+":\n");l++;
               CUP$parser$result = parser.getSymbolFactory().newSymbol("NT$3",52, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

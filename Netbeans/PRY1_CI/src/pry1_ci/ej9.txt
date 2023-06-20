@@ -1,12 +1,26 @@
 int main() {
-    int x = 10$
-    int y = 12$
+    int x = 13$
+    int y = 15$
     int res = x + y$
     sysPrint(res)$
 
     int f = 123$
-    int d = 23$
+    int d = 290$
     int res2 = f + d$
     sysPrint(res2)$
+    
+    if(res2>10) {
+        int z = 23$
+        int r = 12$
+        int res3 = 23 - 12$
+        int res4 = z / r$
+        int res5 = r * z$
+        sysPrint(res3)$
+        sysPrint(res4)$
+        sysPrint(res5)$
+    }
+
+
+
     return res$
 }
